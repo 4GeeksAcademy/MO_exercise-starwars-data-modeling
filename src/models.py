@@ -1,155 +1,79 @@
-# import os
-# import sys
-# from sqlalchemy import Column, ForeignKey, Integer, String
-# from sqlalchemy.orm import relationship, declarative_base
-# from sqlalchemy import create_engine
-# from eralchemy2 import render_er
-
-# Base = declarative_base()
-
-# class Person(Base):
-#     __tablename__ = 'person'
-#     # Here we define columns for the table person
-#     # Notice that each column is also a normal Python instance attribute.
-#     id = Column(Integer, primary_key=True)
-#     name = Column(String(250), nullable=False)
-
-# class Address(Base):
-#     __tablename__ = 'address'
-#     # Here we define columns for the table address.
-#     # Notice that each column is also a normal Python instance attribute.
-#     id = Column(Integer, primary_key=True)
-#     street_name = Column(String(250))
-#     street_number = Column(String(250))
-#     post_code = Column(String(250), nullable=False)
-#     person_id = Column(Integer, ForeignKey('person.id'))
-#     person = relationship(Person)
-
-#     def to_dict(self):
-#         return {}
-
-# ## Draw from SQLAlchemy base
-# render_er(Base, 'diagram.png')
 import os
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime
-from sqlalchemy.orm import relationship, declarative_base
-from sqlalchemy import create_engine
-from eralchemy2 import render_er
+from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
+from eralchemy import render_er
 
 Base = declarative_base()
 
 class User(Base):
-    __tablename__ = 'users'
+    __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
-    username = Column(String(20), nullable=False)
-    last_name = Column(String(40), nullable=False)
-    email = Column(String(50), nullable=False, unique=True)
-    password = Column(String(50), nullable=False)
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'username': self.username,
-            'last_name': self.last_name,
-            'email': self.email
-        }
+    email = Column(String(120))
+    password = Column(String(80))
 
 class Planet(Base):
-    __tablename__ = 'planets'
+    __tablename__ = 'planet'
     id = Column(Integer, primary_key=True)
-    name = Column(String(20), nullable=False)
-    diameter = Column(Float, nullable=True)
-    gravity = Column(String(20), nullable=True)
-    surface_water = Column(Integer, nullable=True)
+    name = Column(String(120), nullable=False)
+    climate = Column(String(80), nullable=False)
+    terrain = Column(String(80), nullable=False)
+    diameter = Column(String(80), nullable=False)
+    surface_water = Column(String(80), nullable=False)
+    gravity = Column(String(80), nullable=False)
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'diameter': self.diameter,
-            'gravity': self.gravity,
-            'surface_water': self.surface_water
-        }
-
-class Character(Base):
-    __tablename__ = 'characters'
+class People(Base):
+    __tablename__ = 'people'
     id = Column(Integer, primary_key=True)
-    name = Column(String(20), nullable=False)
-    height = Column(Float, nullable=True)
-    mass = Column(Float, nullable=True)
-    gender = Column(String(10), nullable=True)
-    created_date_time = Column(DateTime, nullable=False)
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'height': self.height,
-            'mass': self.mass,
-            'gender': self.gender,
-            'created_date_time': self.created_date_time
-        }
+    name = Column(String(120), nullable=False)
+    gender = Column(String(120), nullable=False)
+    birthday = Column(String(120), nullable=False)
+    height = Column(String(120),  nullable=False)
+    skin = Column(String(120),  nullable=False)
+    eyes = Column(String(120),  nullable=False)
+    planet_id = Column(Integer, ForeignKey('planet.id'))
+    planet = relationship(Planet)
 
 class Vehicle(Base):
-    __tablename__ = 'vehicles'
+    __tablename__ = 'vehicle'
     id = Column(Integer, primary_key=True)
-    name = Column(String(50), nullable=False)
-    model = Column(String(50), nullable=False)
-    passengers = Column(Integer, nullable=True)
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'model': self.model,
-            'passengers': self.passengers
-        }
-
+    name = Column(String(120), nullable=False)
+    lenght = Column(String(80), nullable=False)
+    passengers = Column(String(80), nullable=False)
+    capacity = Column(String(80), nullable=False)
+    manufacturer = Column(String(80), nullable=False)
+    
 class FavoritePlanet(Base):
-    __tablename__ = 'favorite_planets'
+    __tablename__ = 'favoritePlanet'
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    planet_id = Column(Integer, ForeignKey('planets.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    planet_id = Column(Integer, ForeignKey('planet.id'))
     user = relationship(User)
     planet = relationship(Planet)
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'user_id': self.user_id,
-            'planet_id': self.planet_id
-        }
-
-class FavoriteCharacter(Base):
-    __tablename__ = 'favorite_characters'
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    character_id = Column(Integer, ForeignKey('characters.id'), nullable=False)
-    user = relationship(User)
-    character = relationship(Character)
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'user_id': self.user_id,
-            'character_id': self.character_id
-        }
-
 class FavoriteVehicle(Base):
-    __tablename__ = 'favorite_vehicles'
+    __tablename__ = 'favoriteVehicle'
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    vehicle_id = Column(Integer, ForeignKey('vehicles.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    vehicle_id = Column(Integer, ForeignKey('vehicle.id'))
     user = relationship(User)
     vehicle = relationship(Vehicle)
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'user_id': self.user_id,
-            'vehicle_id': self.vehicle_id
-        }
+class FavoritePeople(Base):
+    __tablename__ = 'favoritePeople'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    people_id = Column(Integer, ForeignKey('people.id'))
+    user = relationship(User)
+    people = relationship(People)
 
-## Draw from SQLAlchemy base
-render_er(Base, 'diagram.png')
+    def to_dict(self):
+        return {}
+
+# Crea un motor de base de datos y todas las tablas
+engine = create_engine('sqlite:///example.db')
+Base.metadata.create_all(engine)
+
+# Renderiza el diagrama ER
+render_er('sqlite:///example.db', 'diagram.png')
